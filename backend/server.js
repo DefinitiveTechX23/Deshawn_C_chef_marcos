@@ -44,6 +44,36 @@ app.get("/menu", function (request, response) {
 
 });
 
+// Menu Item route
+app.get("/menu/:menuItem", function (request, response) {
+    var menuItemId = parseInt(request.params.menuItem); // Convert the ID from string to number
+    var item = menu.find(function (menuItem) {
+        return menuItem.id === menuItemId;
+    });
+
+    if (item) {
+        response.json(item); // Send the requested menu item
+    } else {
+        response.status(404).json({ error: "Menu item not found" });
+    }
+});
+
+// Reservation route
+
+app.post("/reservations", function (request, response) {
+
+    response.status(501).json({
+        error: "Reservations functionality is not added yet."
+
+    });
+
+
+});
+
+
+
+
+
 //Tell the express app that you want it to listen on port 8080 of your computer
 app.listen(8080, function () {
 
