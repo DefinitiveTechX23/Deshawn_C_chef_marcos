@@ -42,7 +42,22 @@ app.get("/", function (request, response) {
 app.get("/menu", function (request, response) {
     response.json(menu);
 
+
+ if (!isNaN(maxPrice)) {
+        var filteredMenu = menu.filter(function(menuItem) {
+            return menuItem.price <= maxPrice; // gives back item with the same price or lower
+        });
+        response.json(filteredMenu);
+    } else {
+        response.json(menu); // shows the menu again if no price is given 
+    }
 });
+
+
+
+
+
+
 
 // Menu Item route
 app.get("/menu/:menuItem", function (request, response) {
@@ -61,23 +76,47 @@ app.get("/menu/:menuItem", function (request, response) {
 // Reservation route
 
 app.post("/reservations", function (request, response) {
+    var reservation = request.body; 
 
-    response.status(501).json({
-        error: "Reservations functionality is not added yet."
+    
+    if (!reservation.name || !reservation.date || !reservation.time) {
+        response.status(400).json({ error: "Missing name, date, or time" });
+        return; // Stop execution
+    }
 
+    
+    response.status(201).json({
+        message: reservation.name + ", thank you for reserving at Chef Marco’s Restaurant on " +
+                 reservation.date + " at " + reservation.time + "! Your reservation is confirmed."
     });
+});
 
 
+// Protected route for Chef Marco's secret recipe
+app.get("/chef/secret-recipe", verifyChefRole, function (request, response) {
+    response.json({
+        recipeName: "Chef Marco’s Legendary Marinara",
+        ingredients: ["San Marzano tomatoes", "Olive oil", "Garlic", "Fresh basil", "Parmesan", "Red wine"],
+        instructions: "Blend tomatoes, sauté garlic in olive oil, simmer with red wine, stir in Parmesan, add fresh basil. Serve "
+    });
+});
+
+
+//  Middleware
+app.use(function (request, response, next) {
+    var timestamp = new Date().toISOString(); // turns timestamp to a string
+    console.log(`[${timestamp}] ${request.method} ${request.url}`);
+    next(); 
 });
 
 
 
 
 
-//Tell the express app that you want it to listen on port 8080 of your computer
+
+
 app.listen(8080, function () {
 
-    //This function gets executed when the app starts listening
     console.log("Server is listening on 8080");
 });
 
